@@ -1,5 +1,6 @@
 ﻿using AuctionDomainReconcilia;
 using AuctionDomainReconcilia.lib;
+using ContractNotifyCollector;
 using ContractNotifyCollector.core;
 using ContractNotifyCollector.helper;
 using DomainNotifyCollector.contract.mail;
@@ -36,6 +37,10 @@ namespace DomainNotifyCollector.contract.monitor
                 {
                     ping();
                     process();
+                    for(int i=0; i< reconciliaHours; ++i)
+                    {
+                        Thread.Sleep(1000 * 60 * 60);
+                    }
                 } catch (Exception ex)
                 {
                     LogHelper.printEx(ex);
@@ -52,7 +57,7 @@ namespace DomainNotifyCollector.contract.monitor
             int rmax = getRmax();
 
             
-            //if (lmax >= rmax) return;
+            if (lmax >= rmax) return;
             
             // 获取参与竞拍地址列表
             List<string> addrs = MongoDBHelperExtra.getAuctionAddrList(mongodbConnStr, mongodbDatabase, auctionStateCol, lmax, rmax, bonusAddr);
@@ -102,8 +107,8 @@ namespace DomainNotifyCollector.contract.monitor
                 });
             });
             
-            addrBalanceQueue.Add(string.Format("addr={0},auctionId={1},smBalance={2},dbBalance={3}", 1,1,1,1));
-            addrIdBalanceQueue.Add(string.Format("addr={0},auctionId={1},smBalance={2},dbBalance={3}", 1,1,1,1));
+            //addrBalanceQueue.Add(string.Format("addr={0},auctionId={1},smBalance={2},dbBalance={3}", 1,1,1,1));
+            //addrIdBalanceQueue.Add(string.Format("addr={0},auctionId={1},smBalance={2},dbBalance={3}", 1,1,1,1));
             // 发送
             StringBuilder sb = new StringBuilder();
             sb.Append("注册器下账户地址余额:");
@@ -170,6 +175,7 @@ namespace DomainNotifyCollector.contract.monitor
         private static string apiUrl;
         private static string regscripthash;
         private static string reconciliaRecord;
+        private static int reconciliaHours;
 
         private MailClient mc;
         private bool initSuccFlag = false;
@@ -177,8 +183,8 @@ namespace DomainNotifyCollector.contract.monitor
         {
             JToken cfg = config["TaskList"].Where(p => p["taskName"].ToString() == name() && p["taskNet"].ToString() == networkType()).ToArray()[0]["taskInfo"];
 
-            mongodbConnStr = cfg["mongodbConnStr"].ToString();
-            mongodbDatabase = cfg["mongodbDatabase"].ToString();
+            mongodbConnStr = Config.notifyDbConnInfo.connStr;   
+            mongodbDatabase = Config.notifyDbConnInfo.connDB;  
             auctionStateCol = cfg["auctionStateCol"].ToString();
             cgasBalanceCol = cfg["cgasBalanceCol"].ToString();
             RegAddr = cfg["registerAddress"].ToString();
@@ -186,6 +192,7 @@ namespace DomainNotifyCollector.contract.monitor
             apiUrl = cfg["apiUrl"].ToString();
             regscripthash = cfg["regscripthash"].ToString();
             reconciliaRecord = cfg["reconciliaRecord"].ToString();
+            reconciliaHours = int.Parse(cfg["reconciliaHours"].ToString());
 
             // 合约调用
             ContractHelper.setApiUrl(apiUrl);
