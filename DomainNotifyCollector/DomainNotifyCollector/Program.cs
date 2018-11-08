@@ -25,8 +25,8 @@ namespace DomainNotifyCollector
         /// </summary>
         private static void InitTask()
         {
-            //AddTask(new DomainUpdateColletor("DomainUpdateCollector"));
-            //AddTask(new DomainUpdateSender("DomainUpdateSender") );
+            AddTask(new DomainUpdateColletor("DomainUpdateCollector"));
+            AddTask(new DomainUpdateSender("DomainUpdateSender") );
             AddTask(new DomainAuctionReconciliation("DomainAuctionReconciliation") );
         }
 
