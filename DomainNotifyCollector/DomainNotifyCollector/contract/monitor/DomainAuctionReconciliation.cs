@@ -106,8 +106,8 @@ namespace DomainNotifyCollector.contract.monitor
                 });
             });
             
-            //addrBalanceQueue.Add(string.Format("addr={0},auctionId={1},smBalance={2},dbBalance={3}", 1,1,1,1));
-            //addrIdBalanceQueue.Add(string.Format("addr={0},auctionId={1},smBalance={2},dbBalance={3}", 1,1,1,1));
+            //addrBalanceQueue.Add(string.Format("\taddr={0},auctionId={1},smBalance={2},dbBalance={3}", 1,1,1,1));
+            //addrIdBalanceQueue.Add(string.Format("\taddr={0},auctionId={1},smBalance={2},dbBalance={3}", 1,1,1,1));
             // 发送
             StringBuilder sb = new StringBuilder();
             sb.Append("\n1.注册器下账户地址余额对比:");
@@ -207,7 +207,7 @@ namespace DomainNotifyCollector.contract.monitor
                 subject = cfg["subject"].ToString(),
                 body = cfg["body"].ToString(),
                 listener = cfg["listener"].ToString(),
-                smtpEnableSsl = false
+                smtpEnableSsl = cfg["useSsl"].ToString() == "1"
             });
 
             initSuccFlag = true;
