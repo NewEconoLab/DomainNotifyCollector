@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
@@ -44,7 +45,21 @@ namespace DomainNotifyCollector.contract.mail
             msg.BodyEncoding = Encoding.UTF8;
             msg.Priority = MailPriority.High;
             msg.IsBodyHtml = false;
-            msg.To.Add(to);
+
+            string toEmail = to;
+            if(to.IndexOf(",") >= 0)
+            {
+                var toArr = to.Split(",");
+                toEmail = toArr[0];
+                if(toArr.Length > 1)
+                {
+                    foreach(var addr in toArr.Skip(1).ToArray())
+                    {
+                        msg.CC.Add(addr);
+                    }
+                }
+            }
+            msg.To.Add(toEmail);
             return msg;
         }
         public bool sendCode(string mail, string code)

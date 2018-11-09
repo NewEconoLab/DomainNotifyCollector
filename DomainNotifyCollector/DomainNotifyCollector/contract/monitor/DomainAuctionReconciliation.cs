@@ -55,7 +55,6 @@ namespace DomainNotifyCollector.contract.monitor
 
             // 最新高度
             int rmax = getRmax();
-
             
             if (lmax >= rmax) return;
             
@@ -111,18 +110,18 @@ namespace DomainNotifyCollector.contract.monitor
             //addrIdBalanceQueue.Add(string.Format("addr={0},auctionId={1},smBalance={2},dbBalance={3}", 1,1,1,1));
             // 发送
             StringBuilder sb = new StringBuilder();
-            sb.Append("注册器下账户地址余额:");
+            sb.Append("\n1.注册器下账户地址余额对比:");
             foreach( var it in addrBalanceQueue.ToArray())
             {
                 sb.Append("\n\t").Append(it);
             }
-            sb.Append("\n注册器下账户地址竞拍余额:");
+            sb.Append("\n2.注册器下账户地址竞拍余额对比:");
             foreach (var it in addrIdBalanceQueue)
             {
                 sb.Append("\n\t").Append(it);
             }
             Console.WriteLine(sb.ToString());
-            mc.sendBody(sb.ToString());
+            mkc.sendToListener(sb.ToString());
             while(addrBalanceQueue.Count > 0) addrBalanceQueue.Take();
             while(addrIdBalanceQueue.Count > 0) addrIdBalanceQueue.Take();
 
@@ -176,8 +175,8 @@ namespace DomainNotifyCollector.contract.monitor
         private static string regscripthash;
         private static string reconciliaRecord;
         private static int reconciliaHours;
-
-        private MailClient mc;
+        
+        private MailKitClient mkc;
         private bool initSuccFlag = false;
         private void initConfig()
         {
@@ -199,15 +198,17 @@ namespace DomainNotifyCollector.contract.monitor
             ContractHelper.setRegHash(regscripthash);
 
             cfg = cfg["mailInfo"];
-            mc = new MailClient(new MailConfig {
+            mkc = new MailKitClient(new MailConfig
+            {
                 mailFrom = cfg["mailFrom"].ToString(),
                 mailPwd = cfg["mailPwd"].ToString(),
                 smtpHost = cfg["smtpHost"].ToString(),
                 smtpPort = int.Parse(cfg["smtpPort"].ToString()),
                 subject = cfg["subject"].ToString(),
+                body = cfg["body"].ToString(),
                 listener = cfg["listener"].ToString(),
+                smtpEnableSsl = false
             });
-            
 
             initSuccFlag = true;
         }
