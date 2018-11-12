@@ -1,6 +1,8 @@
 ﻿using MailKit.Net.Smtp;
 using MimeKit;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace DomainNotifyCollector.contract.mail
 {
@@ -47,6 +49,33 @@ namespace DomainNotifyCollector.contract.mail
             msg.To.Add(new MailboxAddress("subscriber", to));
             msg.Subject = config.domainNotifySubj;
             msg.Body = new TextPart("plain") { Text = string.Format(config.domainNotifyBody, message) };
+
+            return send(msg);
+        }
+        public bool sendData(string mail, List<MailData> data)
+        {
+            string subject = config.domainNotifySubj;
+            StringBuilder sb = new StringBuilder();
+            foreach (var it in data)
+            {
+                string ss = string.Format(config.domainNotifyBody,
+                    it.fulldomain,
+                    it.maxPrice,
+                    it.maxBuyer
+                    );
+                string[] fmt = ss.Split(",");
+                foreach (var s in ss.Split(","))
+                {
+                    sb.Append(s).Append("\n");
+                }
+            };
+            string body = sb.ToString();
+
+            var msg = new MimeMessage();
+            msg.From.Add(new MailboxAddress("sccot", config.mailFrom));
+            msg.To.Add(new MailboxAddress("ss", mail));
+            msg.Subject = config.domainNotifySubj;
+            msg.Body = new TextPart("plain") { Text = body };
 
             return send(msg);
         }

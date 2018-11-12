@@ -55,14 +55,19 @@ namespace DomainNotifyCollector.contract.monitor
 
             // 最新高度
             int rmax = getRmax();
-            
-            if (lmax >= rmax) return;
+
+            if (lmax >= rmax)
+            {
+                LogHelper.debug(string.Format("{0} has processed at {1}/{2}", name(), lmax, rmax));
+                return;
+            }
             
             // 获取参与竞拍地址列表
             List<string> addrs = MongoDBHelperExtra.getAuctionAddrList(mongodbConnStr, mongodbDatabase, auctionStateCol, lmax, rmax, bonusAddr);
             if (addrs == null || addrs.Count == 0)
             {
                 updateRecord(rmax);
+                LogHelper.debug(string.Format("{0} has processed at {1}/{2}", name(), lmax, rmax));
                 return;
             }
             
@@ -128,7 +133,7 @@ namespace DomainNotifyCollector.contract.monitor
 
             // 更新高度
             updateRecord(rmax);
-            LogHelper.debug(string.Format("{0} has processed at {1}", name(), rmax));
+            LogHelper.debug(string.Format("{0} has processed at {1}/{2}", name(), lmax,rmax));
         }
         private BlockingCollection<string> addrBalanceQueue = new BlockingCollection<string>();
         private BlockingCollection<string> addrIdBalanceQueue = new BlockingCollection<string>();

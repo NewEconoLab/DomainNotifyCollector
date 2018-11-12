@@ -135,10 +135,10 @@ namespace DomainNotifyCollector.contract
         }
 
         private BlockingCollection<SendMsg> sendQueue = new BlockingCollection<SendMsg>();
-        private MailClient mc;
+        private MailKitClient mc;
         private void sendThread()
         {
-            mc = new MailClient(mailConfig);
+            mc = new MailKitClient(mailConfig);
             while(true)
             {
                 try
